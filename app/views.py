@@ -4,6 +4,7 @@ from .forms import LoginForm
 from .models import *
 from flask_login import current_user,login_required,logout_user,login_user
 
+
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -20,10 +21,10 @@ def load_user(id):
 def before_request():
     g.user = current_user
 
-def checkedUser(userName, passHash):
+def checkedUser(userName, password):
     u = None
     u = User.query.filter_by(username=userName).first()
-    if u is not None and u.password == passHash:
+    if u is not None and u.verifyPassword(password):
         return u
     else:
         return None
@@ -32,7 +33,7 @@ def checkedUser(userName, passHash):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        u = checkedUser(form.user_name.data, getHashedPass(form.password.data))
+        u = checkedUser(form.user_name.data, form.password.data)
         if  u is not None:
             login_user(u, form.remember_me)
             return redirect(url_for('index'))
@@ -42,8 +43,11 @@ def login():
                            title='Sign In',
                            form=form)
 
-def getHashedPass(password):
-    return password
+@app.route('/register', methods=['GET','POSTS'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+
 
 @app.route('/device_login/<user>/<regid>', methods=['POST'])
 def updateRegID(user, regid):
@@ -54,11 +58,15 @@ def updateRegID(user, regid):
         u = User.query.filter_by(username=user).first()
         if u is None:
             abort(404)
+        if not json.has_key('pass'):
+            return abort(500, "no password supplied")
+        if u.password != getHashedPass(json['pass']):
+            abort(401)
         di = DeviceInfo.query.filter_by(user_id=u.id, regid=regid).first()
         if di is not None:
             return '', 304
         if not json.has_key('device_name') or not json.has_key('device_manufacture'):
-            abort(500)
+            abort(500, "no device name or device manufacture supplied")
         device_name = json['device_name']
         device_manufacture =  json['device_manufacture']
         user_id = u.id
@@ -67,5 +75,4 @@ def updateRegID(user, regid):
             di.device_imei = json['imei']
         db.session.add(di)
         db.session.commit()
-        login_user(u)
         return '', 200

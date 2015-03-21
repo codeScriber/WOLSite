@@ -1,4 +1,5 @@
 from . import db
+from passlib.apps import custom_app_context as pwd_context
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,6 +31,12 @@ class User(db.Model):
         if id is not None and id != '':
             user = cls.query.get(int(id))
         return user
+
+    def verifyPassword(self, password):
+        pwd_context.verify(password, self.password)
+
+    def hash_password(self, password):
+        self.password = pwd_context.encrypt(password)
 
     def __repr__(self):
         return '<User %r : %r>' % (self.username, self.regid)
