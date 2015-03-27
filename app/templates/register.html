@@ -39,10 +39,10 @@
             <div class="col-md-4 col-md-offset-4">
                 <div class="login-panel panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Please Sign In</h3>
+                        <h3 class="panel-title">Please Register</h3>
                     </div>
                     <div class="panel-body">
-                        <form role="form" action="" method="post" name="login">
+                        <form role="form" action="" method="post" name="register">
                             {{ form.hidden_tag() }}
                             <fieldset>
                                 <div class="form-group">
@@ -56,7 +56,15 @@
                                 <div class="form-group">
                                     {{ form.password(class="form-control",placeholder="Password") }}
                                     <ul class="list-unstyled" >
-                                    {% for error in form.user_name.errors %}
+                                    {% for error in form.password.errors %}
+                                        <li class="text-danger"> {{error}}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.retype_password(class="form-control",placeholder="Retype Password") }}
+                                    <ul class="list-unstyled" >
+                                    {% for error in form.retype_password.errors %}
                                         <li class="text-danger"> {{error}}</li>
                                     {% endfor %}
                                     </ul>
@@ -66,21 +74,20 @@
                                         {{ form.remember_me }} Remember Me
                                     </label>
                                 </div>
-                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Sign In"/>
+                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Register"/>
                             </fieldset>
                         </form>
-                         {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                        <ul class="list-unstyled">
-                        {% for message in messages %}
-                            <li class="text-danger">{{ message }} </li>
-                        {% endfor %}
-                        </ul>
-                        {% endif %}
-                        {% endwith %}
-                        <a class="text-info" style="margin-left: 20px;margin-top: 7px" href="{{ url_for('register')}}">Register a New Account</a>
-                    </div>
+                            {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                <ul class="list-unstyled">
+                                {% for message in messages %}
+                                    <li class="text-danger">{{ message }} </li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% endwith %}
 
+                    </div>
                 </div>
             </div>
         </div>

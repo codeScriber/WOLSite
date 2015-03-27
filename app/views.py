@@ -1,15 +1,17 @@
 from app import app, lm
 from flask import render_template, redirect, url_for, g,flash, request, abort
-from .forms import LoginForm
+from .forms import LoginForm ,RegisterForm
 from .models import *
-from flask_login import current_user,login_required,logout_user,login_user
+from flask_login import current_user,logout_user,login_user
 
 
 @app.route('/')
 @app.route('/index')
-@login_required
 def index():
-    return render_template('index.html', title='Index')
+    if current_user.is_authenticated() and not current_user.is_anonymous():
+        return render_template('index.html', title='Index')
+    else:
+        return redirect('/login')
 
 
 @lm.user_loader
@@ -22,7 +24,6 @@ def before_request():
     g.user = current_user
 
 def checkedUser(userName, password):
-    u = None
     u = User.query.filter_by(username=userName).first()
     if u is not None and u.verifyPassword(password):
         return u
@@ -43,10 +44,32 @@ def login():
                            title='Sign In',
                            form=form)
 
-@app.route('/register', methods=['GET','POSTS'])
+@app.route('/logout', methods=['GET'])
+def logout():
+    if current_user.is_authenticated() and not current_user.is_anonymous():
+        logout_user()
+        return redirect('login')
+    else:
+        abort(500)
+
+@app.route('/register', methods=['GET','POST'])
 def register():
-    form = RegistrationForm()
+    form = RegisterForm()
     if form.validate_on_submit():
+        u = User.query.filter_by(username=form.user_name.data).first()
+        if u is not None:
+            flash("User %s already exists" % form.user_name.data)
+        elif form.password.data != form.retype_password.data:
+            flash("password fields must match!")
+        else:
+            if current_user.is_authenticated() and not current_user.is_anonymous():
+                logout_user()
+                u = User(form.user_name.data, form.password.data)
+                User.session.add(u)
+                User.session.commit()
+                login_user(u, remember=form.remember_me.data)
+                return redirect(url_for('index'))
+    return render_template('register.html', title='Please Register', form=form)
 
 
 @app.route('/device_login/<user>/<regid>', methods=['POST'])

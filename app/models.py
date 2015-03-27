@@ -10,7 +10,7 @@ class User(db.Model):
 
     def __init__(self, name, password, regid):
         self.username = name
-        self.password = password
+        self.hash_password(password)
         self.regid = regid
 
     def is_authenticated(self):
