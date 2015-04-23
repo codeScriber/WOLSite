@@ -1,5 +1,5 @@
 from app import app, lm
-from flask import render_template, redirect, url_for, g,flash, request, abort
+from flask import render_template, redirect, url_for, g,flash, request, abort ,session
 from .forms import LoginForm ,RegisterForm
 from .models import *
 from flask_login import current_user,logout_user,login_user
@@ -9,7 +9,9 @@ from flask_login import current_user,logout_user,login_user
 @app.route('/index')
 def index():
     if current_user.is_authenticated() and not current_user.is_anonymous():
-        return render_template('index.html', title='Index')
+        devices = current_user.devices
+        selected_device_index = session['device_index'] if 'device_index' in session else 0
+        return render_template('index.html', title='Index', devices=devices, selected_device_index=selected_device_index)
     else:
         return redirect('/login')
 
@@ -64,11 +66,11 @@ def register():
         else:
             if current_user.is_authenticated() and not current_user.is_anonymous():
                 logout_user()
-                u = User(form.user_name.data, form.password.data)
-                User.session.add(u)
-                User.session.commit()
-                login_user(u, remember=form.remember_me.data)
-                return redirect(url_for('index'))
+            u = User(form.user_name.data, form.password.data)
+            db.session.add(u)
+            db.session.commit()
+            login_user(u, remember=form.remember_me.data)
+            return redirect(url_for('index'))
     return render_template('register.html', title='Please Register', form=form)
 
 
@@ -83,7 +85,7 @@ def updateRegID(user, regid):
             abort(404)
         if not json.has_key('pass'):
             return abort(500, "no password supplied")
-        if u.password != getHashedPass(json['pass']):
+        if not u.verifyPassword(json['pass']):
             abort(401)
         di = DeviceInfo.query.filter_by(user_id=u.id, regid=regid).first()
         if di is not None:

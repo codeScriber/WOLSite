@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
 
@@ -45,6 +45,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
+
             </div>
             <!-- /.navbar-header -->
 
@@ -68,13 +69,50 @@
                 <!-- /.dropdown -->
             </ul>
             <!-- /.navbar-top-links -->
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="#" class="active"><i class="fa fa-fw"></i> Device A</a>
+                        </li>
+                        <li>
+                            <a href="#" class="active"><i class="fa fa-fw"></i> Device B</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
 
         </nav>
 
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Dashboard</h1>
+                    <h1 id="device_title" class="page-header"></h1>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            WOL Actions
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="wol-form">
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-primary" id="send-default">Send WOL to Default</button>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Text Input</label>
+                                            <input class="form-control" placeholder="Network Address" id="netaddress" >
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="form-control" placeholder="MAC Address" id=""macaddress>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>

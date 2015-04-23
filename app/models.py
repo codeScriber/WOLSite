@@ -8,7 +8,7 @@ class User(db.Model):
     regid    = db.Column(db.String(10))
     devices  = db.relationship('DeviceInfo', backref = 'owner', lazy='dynamic')
 
-    def __init__(self, name, password, regid):
+    def __init__(self, name, password, regid=None):
         self.username = name
         self.hash_password(password)
         self.regid = regid
@@ -33,7 +33,7 @@ class User(db.Model):
         return user
 
     def verifyPassword(self, password):
-        pwd_context.verify(password, self.password)
+        return pwd_context.verify(password, self.password)
 
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
